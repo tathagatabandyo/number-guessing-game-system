@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Guessing Game</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1>Number Guessing Game</h1>
+                <p class="instructions">Guess a number between 1 and 100</p>
+            </div>
+
+            <div class="card-body">
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-label">Round</span>
+                        <span class="stat-value" th:text="${roundNumber}">1</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Attempts Left</span>
+                        <span class="stat-value" th:text="${attemptsRemaining}">10</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Rounds Won</span>
+                        <span class="stat-value" th:text="${roundsWon}">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Score</span>
+                        <span class="stat-value" th:text="${score}">0</span>
+                    </div>
+                </div>
+
+                <div id="feedback"
+                     class="feedback"
+                     th:classappend="${feedbackType == 'correct'} ? ' feedback-correct' : 
+                                    (${feedbackType == 'gameover'} ? ' feedback-gameover' : 
+                                    (${feedbackType == 'highlow'} ? ' feedback-highlow' : ''))"
+                     th:text="${feedback}"
+                     th:unless="${#strings.isEmpty(feedback)}">
+                </div>
+
+                <form id="guessForm" th:action="@{/guess}" method="post" class="guess-form">
+                    <div class="input-group">
+                        <input type="number" id="guess" name="guess" min="1" max="100"
+                               placeholder="Your guess" required autofocus
+                               th:disabled="${gameOver}">
+                        <button type="submit" id="submitBtn" class="btn btn-primary"
+                                th:disabled="${gameOver}">
+                            Submit
+                        </button>
+                    </div>
+                </form>
+
+                <div class="actions">
+                    <form th:action="@{/play-again}" method="post" style="display:inline;" th:if="${gameOver}">
+                        <button type="submit" class="btn btn-success">Play Again</button>
+                    </form>
+                    <form th:action="@{/restart}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Restart Game</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const guessInput = document.getElementById('guess');
+            const submitBtn = document.getElementById('submitBtn');
+            const guessForm = document.getElementById('guessForm');
+            const isGameOver = /*[[${gameOver}]]*/ false;
+
+            if (!isGameOver && guessInput) {
+                guessInput.focus();
+            }
+
+            if (guessForm) {
+                guessForm.addEventListener('submit', function (e) {
+                    const val = parseInt(guessInput.value);
+                    if (isNaN(val) || val < 1 || val > 100) {
+                        e.preventDefault();
+                        alert('Please enter a number between 1 and 100.');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
